@@ -143,9 +143,10 @@ void ChatLogic::LoadAnswerGraphFromFile(std::string filename) {
                                                            [&parentToken](std::unique_ptr<GraphNode> &node) {
                                                                return node->GetID() == std::stoi(parentToken->second);
                                                            });
-                            auto childNode = std::find_if(_nodes.begin(), _nodes.end(), [&childToken](std::unique_ptr<GraphNode> &node) {
-                                return node->GetID() == std::stoi(childToken->second);
-                            });
+                            auto childNode = std::find_if(_nodes.begin(), _nodes.end(),
+                                                          [&childToken](std::unique_ptr<GraphNode> &node) {
+                                                              return node->GetID() == std::stoi(childToken->second);
+                                                          });
 
                             // create new edge
                             std::unique_ptr<GraphEdge> edge = std::make_unique<GraphEdge>(id);
@@ -158,7 +159,7 @@ void ChatLogic::LoadAnswerGraphFromFile(std::string filename) {
                             // store reference in child node and parent node
                             // check
                             (*childNode)->AddEdgeToParentNode(edge.get());
-                            (*parentNode)->AddEdgeToChildNode(edge.get());
+                            (*parentNode)->AddEdgeToChildNode(std::move(edge));
                         }
 
                         ////
@@ -201,6 +202,7 @@ void ChatLogic::LoadAnswerGraphFromFile(std::string filename) {
     SetChatbotHandle(&chatbot); //
     chatbot.SetChatLogicHandle(this);
     chatbot.SetRootNode(rootNode);
+    _chatBot = &chatbot;
     rootNode->MoveChatbotHere(std::move(chatbot));
 
     ////

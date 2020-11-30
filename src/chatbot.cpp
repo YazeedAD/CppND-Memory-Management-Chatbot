@@ -46,7 +46,7 @@ ChatBot::~ChatBot() {
 ChatBot::ChatBot(const ChatBot &source) {
 
     std::cout << "ChatBot: Copy Constructor" << std::endl;
-    _currentNode = source._currentNode;
+//    _currentNode = source._currentNode;
     _rootNode = source._rootNode;
     _chatLogic = source._chatLogic;
     _image = new wxBitmap(*source._image);
@@ -144,7 +144,9 @@ void ChatBot::SetCurrentNode(GraphNode *node) {
     std::mt19937 generator(int(std::time(0)));
     std::uniform_int_distribution<int> dis(0, answers.size() - 1);
     std::string answer = answers.at(dis(generator));
-
+    // to avoid memory corruption interrupted by signal 11: SIGSEGV
+    // not sure how it solved that!
+    _chatLogic->SetChatbotHandle(this);
     // send selected node answer to user
     _chatLogic->SendMessageToUser(answer);
 }
